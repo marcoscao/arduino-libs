@@ -1,24 +1,16 @@
 #ifndef MSC_CORE_MESSAGE_H__
 #define MSC_CORE_MESSAGE_H__
 
+// required to uint8_t, String, ... ( added automatically by Arduino IDE )
 #include <Arduino.h>
 
-
-#define MSG_MAX_BUFFER 32
-
+#define MSG_MAX_BUFFER 56
 #define MSG_HEADER_INFO_MAX_BUFF 8
 #define MSG_BODY_DHT22_TEMP_MAX_BUFF 6
 #define MSG_BODY_DHT22_HUM_MAX_BUFF 4
 
-
 namespace msc
 {
-  
-    struct message;
-    struct msg_header;
-    struct msg_body_pir;
-    struct msg_body_dht22;
-
 
     enum message_type
     {
@@ -27,17 +19,15 @@ namespace msc
         MT_DHT22
     };
 
-
     void set_message_value( String const & s, char & field, int sz_max );
 
 
     struct msg_header
     {
       message_type type;
-      uint8_t body_size;
-      char info[ MSG_HEADER_INFO_MAX_BUFF ];
 
-      void set_info( String const & s );
+      uint8_t body_size;
+      String info;
 
       String serialize();
     };
@@ -45,9 +35,7 @@ namespace msc
 
     struct msg_body 
     {
-    
         virtual String serialize() = 0;
-    
     };
 
 
@@ -56,7 +44,6 @@ namespace msc
       bool presence;
 
       String serialize();
-
     };
 
 
@@ -89,7 +76,6 @@ namespace msc
       String serialize();
 
       void deserialize( String const & s);
-
     };
 
 
@@ -102,25 +88,30 @@ namespace msc
 
         body_union()
         {
-          
+            ;
         }
         
       };
 
+
+      //uint8_t msg_buffer[RH_ASK_MAX_MESSAGE_LEN];
+      //uint8_t msg_buffer_length = sizeof(msg_buffer);
+
+
       msg_header header;
       body_union body;
 
+
       message();
-      static void set_value( String const & s, char & field, int sz_max );
+      
       String serialize();
+
+      void deserialize( uint8_t * buff, uint8_t size );
+ 
     };
-
-
 
 } // end namespace
 
 
 #endif
-
-
 
